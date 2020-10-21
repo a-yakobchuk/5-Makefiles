@@ -1,0 +1,135 @@
+Target name is 'target1
+Target name is 'target2
+1)In both cases the corresponding target name was printed. My conclusion is 
+that $@ gives the name of it's entry point.
+
+ 
+Dependency change for bin1 is 'a.c b.c c.c'
+gcc a.c b.c c.c -o bin1
+make: `bin1' is up to date.
+Dependency change for bin1 is 'b.c c.c'
+gcc a.c b.c c.c -o bin1
+11) My conclusion about the $? variable is that everytime a file was touched it got compiled again because it only compiles when something was changed. 
+
+
+gcc -O1 -g -Wall -std=c99 -pedantic   -c -o a.o a.c
+gcc -O1 -g -Wall -std=c99 -pedantic   -c -o b.o b.c
+gcc -O1 -g -Wall -std=c99 -pedantic   -c -o c.o c.c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+15) Each .o and .c file was compiled, they were linked, and the first dependency was named.
+
+
+gcc -O1 -g -Wall -std=c99 -pedantic   -c -o b.o b.c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+18) Only the b.c and b.o files were compiled again since b.c was touched and only what's changed will be compiled.
+
+
+make: Circular a.c <- a.o dependency dropped.
+make: Circular b.c <- b.o dependency dropped.
+make: Circular c.c <- c.o dependency dropped.
+make: `bin2' is up to date.
+21) The echo didn't print because it didn't compile again since nothing was changed.
+
+
+rm -f *.o bin1 bin2
+Dependency change is 'a'
+gcc a.c -c
+Dependency change is 'b'
+gcc b.c -c
+Dependency change is 'c'
+gcc c.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+Dependency change is 'b'
+gcc b.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+28) At first all three files were compiled as expected and the echo printed. $* printed the name of the file that changed, $^ printed the group object files, and $< printed the first dependency of that group.
+
+
+rm -f *.o bin1 bin2
+Compiling 'a.c'
+gcc a.c -c
+Compiling 'b.c'
+gcc b.c -c
+Compiling 'c.c'
+gcc c.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+33) All the files were compiled since clean was called and then bin2.
+
+
+Compiling 'a.c'
+gcc a.c -c
+Compiling 'b.c'
+gcc b.c -c
+Compiling 'c.c'
+gcc c.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+36) all the files were compiled again since even though only b.c was touched.
+
+
+rm -f *.o bin1 bin2
+Dependency change for bin1 is 'a.c b.c c.c'
+gcc a.c b.c c.c -o bin1
+make: `bin1' is up to date.
+10) all the c files were compiled when bin1 ran for the first time and the second time since nothing changed then nothing was compiled.
+
+
+rm -f *.o bin1 bin2
+Dependency change is 'a'
+gcc a.c -c
+Dependency change is 'b'
+gcc b.c -c
+Dependency change is 'c'
+gcc c.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+make: `bin2' is up to date.
+14) all the object files were compiled and linked, when bin2 was called the second time nothing compiled since nothing was changed.
+
+
+Dependency change is 'b'
+gcc b.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+17) b.c was compiled since it was touched (or changed in this sense) which was expected since it was changed and it only compiles what was changed.
+
+
+rm -f *.o bin1 bin2
+Dependency change is 'a'
+gcc a.c -c
+Dependency change is 'b'
+gcc b.c -c
+Dependency change is 'c'
+gcc c.c -c
+Linking 'a.o b.o c.o' to 'bin2'
+The first dependency of 'a.o b.o c.o' is 'a.o'
+gcc a.o b.o c.o -o bin2
+valgrind --tool=memcheck --leak-check=yes --track-origins=yes  ./bin2>mem.txt
+==20558== Memcheck, a memory error detector
+==20558== Copyright (C) 2002-2017, and GNU GPL'd, by Julian Seward et al.
+==20558== Using Valgrind-3.14.0 and LibVEX; rerun with -h for copyright info
+==20558== Command: ./bin2
+==20558== 
+==20558== 
+==20558== HEAP SUMMARY:
+==20558==     in use at exit: 0 bytes in 0 blocks
+==20558==   total heap usage: 0 allocs, 0 frees, 0 bytes allocated
+==20558== 
+==20558== All heap blocks were freed -- no leaks are possible
+==20558== 
+==20558== For counts of detected and suppressed errors, rerun with: -v
+==20558== ERROR SUMMARY: 0 errors from 0 contexts (suppressed: 0 from 0)
+21) since a clean was ran all the files were compiled which was expected and then valgrind ran to check for errors and memory leaks.

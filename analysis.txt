@@ -1,0 +1,33 @@
+Anita Yakobchuk
+Analysis
+
+In this lab, I implemented the search linked list and sesrch array functions.
+Both were easy to implement but I was having problems with the dynamic arrays
+search function because I had more if conditions than needed so I simplified
+it to have one if statement that checked if the strings were equal and keep
+traversing but if it doesn't find the word then it exits the loop and returns
+NULL. It didn't work at first because I needed to have the bracket and index
+when I was referencing the payload parameter. When I tested the code with 
+TestSearch and engWords.txt it worked. I made the Makefile and it was 
+difficult to understand the dependencies for the mem and test options. I
+changed a lot of terms into variables like text files and the searchword
+so that I could easily change it to test for different cases. I only had PHONY
+for mem and clean at first but then realized I needed it for mem, clean, all
+and help. Wherever I had a source file I changed it to use the $*.c symbol
+instead to make it shorter. I tested the functionality of my Makefile and
+each command worked except make mem. I went and tried changing it to search
+through a smaller file instead of engWords.txt because I knew that it worked
+since I already tested it with a few words. The problem was the way my 
+realloc in the DynamicArrays code specifically in the PushToDarray function
+because I realized I was reallocing by an exponential amount. In my realloc
+it would multiply by the MAX_BUFF_LEN each time it needed to realloc which
+made the program really slow because each realloc was done by an exponential
+amount. I altered it by making it the same as my malloc which is what I 
+should've initially done. I made it multiply by the size of data and the 
+capacity. This made the program run faster and successfully run the make mem
+commmand. It ran for just under 5 minutes and printed the valgrind output to
+the corresponding text file. In the Makefile I also included the cat command
+in front of the text file name so that it would show the contents of the file
+right after it's done executing the command. 
+I gained knowledge about making code more efficient to run faster and about 
+Makefile dependencies. 

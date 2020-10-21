@@ -1,0 +1,33 @@
+
+CC = gcc
+CFLAGS = -O1 -g -Wall -std=c99 -pedantic
+SOURCE = fib.c
+EXE = fib
+OBJ = $(patsubst %.c, %.o, $(SOURCE))
+VALGR = valgrind --tool=memcheck --leak-check=yes --track-origins=yes 
+
+all: $(EXE)
+
+$(EXE): $(OBJ)
+	$(CC)  $(OBJ) -o $(EXE)
+	@echo "linking program"
+
+.c.o: $(SOURCE)
+	$(CC) $(CFLAGS) $(SOURCE) -c
+	@echo "compiled program"
+
+.PHONY: clean
+clean:
+	-rm -f $(OBJ) $(EXE)
+
+.PHONY: mem
+mem: $(EXE)
+	$(VALGR) ./$(EXE) 
+
+help:
+	@echo "make options are: all, clean, mem"
+	@echo "make -f Makefile1 all (should compile fib.c)"
+	@echo "make -f Makefile1 clean (should remove fib binary)"
+	@echo "make -f Makefile1 mem (should build and run Valgrind)"
+
+ 
